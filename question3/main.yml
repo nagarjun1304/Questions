@@ -1,0 +1,24 @@
+---
+- hosts: database
+  connection: local
+  tasks:
+    - name: Retrieve stuff from mysql
+      command: >
+        mysql --user=alice --password={{ password | quote }} dbname
+        --host={{ host | quote }} --batch --skip-column-names
+        --execute="SELECT VirtualMachineType, NUMA_Config, NUMA_Nodes, Physical_CPUs, CPU_Cores, Logical_CPUs, Logical_CPUs_per_NUMA, CPU_AffinityType FROM @cpuInfo"
+      register: database_log
+      check_mode: no
+      changed_when: False
+   
+- hosts: application
+  connection: local
+  tasks:
+    - name: Retrieve stuff from mysql
+      command: >
+        mysql --user=alice --password={{ password | quote }} dbname
+        --host={{ host | quote }} --batch --skip-column-names
+        --execute="SELECT VirtualMachineType, NUMA_Config, NUMA_Nodes, Physical_CPUs, CPU_Cores, Logical_CPUs, Logical_CPUs_per_NUMA, CPU_AffinityType FROM @cpuInfo"
+      register: application_log
+      check_mode: no
+      changed_when: False
